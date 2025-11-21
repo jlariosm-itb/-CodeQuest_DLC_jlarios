@@ -84,6 +84,7 @@ public class Program
         const string LifeRest = "The objective have left {0} HP...";
         const string LvlUp = "Congratulations your level had incrase +1!!!";
 
+
         //Exercice 1
         int op = 0;
         bool validInput;
