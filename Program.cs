@@ -314,16 +314,6 @@ public class Program
                         }
 
                         attempts--;
-
-                        Console.WriteLine(MineUploaded);
-                        for (int i = 0; i < GridSize; i++)
-                        {
-                            for (int j = 0; j < GridSize; j++)
-                            {
-                                Console.Write(visibleGrid[i, j] + " ");
-                            }
-                            Console.WriteLine();
-                        }
                     }
 
                     // Game Over, show total coins found
