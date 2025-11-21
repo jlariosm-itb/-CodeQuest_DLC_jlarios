@@ -27,8 +27,64 @@ public class Program
         const string DayFinished = "A day of exhausting training has finished successfully. You archved {0} of training hours and you gained {1} points of power.";
         const string TrainingFinished = "You has completed your training and you earned {0} of training hours and {1} of power points. ";
         const string CurrentLvl = "Congratulations you archive the level {0}!!!";
-       
-        
+        //Exercice 2
+        const string StartMesagLvl = "Dear Sir{0}, you have your rank but you need level so now its time to level up, lets go to farm some monsters...";
+        const string MonsterAppears = "Oh no, a monster appears! You need to row the dice to defeat it:";
+        const string DiceOne =
+            $"   ________ \n" +
+            $"  /       /|  \n " +
+            $"/_______/ |\n" +
+            $" |       | |\n" +
+            $" |   o   | /\n" +
+            $" |       |/ \n" +
+            $" '-------'";
+        const string DiceTwo =
+            $"   ________ \n" +
+            $"  /       /|  \n " +
+            $"/_______/ |\n" +
+            $" | o     | |\n" +
+            $" |       | /\n" +
+            $" |     o |/ \n" +
+            $" '-------'";
+        const string DiceThree =
+            $"   ________ \n" +
+            $"  /       /|  \n " +
+            $"/_______/ |\n" +
+            $" | o     | |\n" +
+            $" |   o   | /\n" +
+            $" |     o |/ \n" +
+            $" '-------'";
+        const string DiceFour =
+            $"   ________ \n" +
+            $"  /       /|  \n " +
+            $"/_______/ |\n" +
+            $" | o   o | |\n" +
+            $" |       | /\n" +
+            $" | o   o |/ \n" +
+            $" '-------'";
+        const string DiceFive =
+            $"   ________ \n" +
+            $"  /       /|  \n " +
+            $"/_______/ |\n" +
+            $" | o   o | |\n" +
+            $" |   o   | /\n" +
+            $" | o   o |/ \n" +
+            $" '-------'";
+        const string DiceSix =
+            $"   ________ \n" +
+            $"  /       /|  \n " +
+            $"/_______/ |\n" +
+            $" | o   o | |\n" +
+            $" | o   o | /\n" +
+            $" | o   o |/ \n" +
+            $" '-------'";
+        const string MonsterSpawn = "A savage {0} appears with {1} HP!";
+        const string attack = "Press ENTER: to attack the objective";
+        const string ThrowDice = "You attak with {0} of power!";
+        const string LifeRest = "The objective have left {0} HP...";
+        const string LvlUp = "Congratulations your level had incrase +1!!!";
+
+
         //Exercice 1
         int op = 0;
         bool validInput;
@@ -37,6 +93,12 @@ public class Program
         int day = 0;
         var random = new Random();
         string starttraining = "";
+
+        //Exercice 2
+        string[] diceFaces = { DiceOne, DiceTwo, DiceThree, DiceFour, DiceFive, DiceSix };
+        string[] monsters = { "Wandering Skeleton 💀", "Forest Goblin 👹", "Green Slime 🦠", "Ember Wolf 🐺", "Giant Spider 🕷️", "Iron Golem 🤖", "Lost Necromancer 🧝‍", "Ancient Dragon 🐉" };
+        int[] hpMonsters = { 3, 5, 10, 11, 18, 15, 20, 50 };
+
 
         do
         {
@@ -141,10 +203,48 @@ public class Program
                         Console.WriteLine(CurrentLvl, wizardlvl);
                     } while (!starttraining.Equals("YES", StringComparison.OrdinalIgnoreCase));
                     break;
+
+                case 2:
+                    Random rnd = new Random();
+
+                    int index = rnd.Next(monsters.Length);
+
+                    string monster = monsters[index];
+                    int hp = hpMonsters[index];
+
+                    Console.WriteLine(StartMesagLvl, Wizardname);
+                    Console.WriteLine(MonsterAppears);
+                    Console.WriteLine(MonsterSpawn, monster, hp);
+                    while (hp > 0)
+                    {
+                        Console.WriteLine(attack);
+                        Console.ReadLine();
+
+                        int roll = rnd.Next(1, 7);
+                        Console.WriteLine(ThrowDice, roll);
+
+
+                        Console.WriteLine(diceFaces[roll - 1]);
+
+                        hp = hp - roll;
+
+                        Console.WriteLine(LifeRest, hp);
+                    }
+                    wizardlvl++;
+                    Console.WriteLine(LvlUp);
+                    Console.WriteLine(CurrentLvl, wizardlvl);
+                    break;
+
             }
 
 
         } while (op != 0);
+
+
+
+
+
+
     }
 
 }
