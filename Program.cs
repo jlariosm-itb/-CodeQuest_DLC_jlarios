@@ -2,6 +2,7 @@
 using System.Diagnostics.Metrics;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
+using System.Text.RegularExpressions;
 
 public class Program
 {
@@ -195,6 +196,20 @@ public class Program
         const string AtkLvl5 = "Level 5 - Cataclysm 🌋, Portal of Chaos 🌀, Arcane Blood Pact 🩸, Elemental Storm ⛈️";
         const string OverLvl = "Your level is bigger than 5 so you have all the attaks and you are overlevel...";
 
+        // Exercice 7
+        const string PerPresentation = "You found an ancient scroll with encrypted messages!";
+        const string Scroll1 = "The 🐲 sleeps in the mountain of fire 🔥";
+        const string Scroll2 = "Ancient magic flows through the crystal caves";
+        const string Scroll3 = "Spell: Ignis 5 🔥, Aqua 6 💧, Terra 3 🌍, Ventus 8 🌪️";
+
+        const string Ex7MenuMessage = "Choose an option:";
+        const string Ex7Option1Message = "1. Remove spaces from the first scroll";
+        const string Ex7Option2Message = "2. Count vowels from the second scroll";
+        const string Ex7Option3Message = "3. Extract numbers from the third scroll";
+        const string Ex7Option4Message = "4. Exit";
+        const string Ex7InvalidOptionMessage = "Invalid option. Please try again.";
+        const string Ex7SuccessMessage = "Success! Task completed.";
+
         //Exercice 1 - Variables
         int op = 0;
         bool validInput;
@@ -230,6 +245,15 @@ public class Program
         int[] itemsprice = { 30, 10, 50, 40, 20 };
         int itemBits = 0;
 
+        // Exercice 6
+        string[][] attackLevels = new string[][]
+        {
+            new string[] { AtkLvl1 }, // Nivel 1
+            new string[] { AtkLvl2 }, // Nivel 2
+            new string[] { AtkLvl3 }, // Nivel 3
+            new string[] { AtkLvl4 }, // Nivel 4
+            new string[] { AtkLvl5 }  // Nivel 5
+        };
 
 
         do
@@ -528,29 +552,74 @@ public class Program
 
                 case 6:
                     Console.WriteLine(ShowAtkMsg);
-                    if (wizardlvl == 1)
+                    if (wizardlvl >= 1 && wizardlvl <= 5)
                     {
-                        Console.WriteLine(AtkLvl1);
-                    }
-                    else if (wizardlvl == 2) 
-                    {
-                        Console.WriteLine(AtkLvl2);
-                    }
-                    else if (wizardlvl == 3)
-                    {
-                        Console.WriteLine(AtkLvl3);
-                    }
-                    else if (wizardlvl == 4)
-                    {
-                        Console.WriteLine(AtkLvl4);
-                    }
-                    else if (wizardlvl == 5)
-                    {
-                        Console.WriteLine(AtkLvl5);
+                        Console.WriteLine(attackLevels[wizardlvl - 1][0]); 
                     }
                     else
                     {
                         Console.WriteLine(OverLvl);
+                    }
+                    break;
+
+                case 7:
+                    Console.WriteLine(PerPresentation);
+                    Console.WriteLine("1. " + Scroll1);
+                    Console.WriteLine("2. " + Scroll2);
+                    Console.WriteLine("3. " + Scroll3);
+
+                    // Menú interactivo
+                    while (true)
+                    {
+                        Console.WriteLine("\n" + Ex7MenuMessage);
+                        Console.WriteLine(Ex7Option1Message);
+                        Console.WriteLine(Ex7Option2Message);
+                        Console.WriteLine(Ex7Option3Message);
+                        Console.WriteLine(Ex7Option4Message);
+                        Console.Write("Option: ");
+
+                        string input = Console.ReadLine();
+
+                        if (input == "1")
+                        {
+                            string scrollWithoutSpaces = Scroll1.Replace(" ", ""); // Remove spaces
+                            Console.WriteLine("1. Scroll without spaces: " + scrollWithoutSpaces);
+                            Console.WriteLine(Ex7SuccessMessage);
+                        }
+                        else if (input == "2")
+                        {
+                            string vowels = "aeiouáéíóúàèìòù";
+                            int countVowels = 0;
+                            foreach (char c in Scroll2.ToLower()) 
+                            {
+                                if (vowels.Contains(c))
+                                {
+                                    countVowels++; //increment the count
+                                }
+                            }
+                            Console.WriteLine("2. Number of vowels: " + countVowels);
+                            Console.WriteLine(Ex7SuccessMessage);
+                        }
+                        else if (input == "3")
+                        {
+                            var matches = Regex.Matches(Scroll3, @"\d+");
+                            Console.Write("3. Extracted numbers: ");
+                            foreach (var match in matches)
+                            {
+                                Console.Write(match + " "); // Print each extracted number
+                            }
+                            Console.WriteLine();
+                            Console.WriteLine(Ex7SuccessMessage);
+                        }
+                        else if (input == "4")
+                        {
+                            Console.WriteLine("Goodbye!");
+                            break;
+                        }
+                        else
+                        {
+                            Console.WriteLine(Ex7InvalidOptionMessage);
+                        }
                     }
                     break;
 
