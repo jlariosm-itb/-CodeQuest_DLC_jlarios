@@ -108,6 +108,9 @@ public class Program
         const int GridSize = 5;
         const int MaxAttempts = 5;
 
+        // Exercice 4 - Show inventory
+        const string ShowInventory = "Your inventory contains:";
+
         // Exercice 5 - Buy Items Constants
         const string AmegoSegarro = 
             "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠌⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀\r\n" +
@@ -202,13 +205,15 @@ public class Program
         int[,] hiddenGrid = new int[GridSize, GridSize]; // Hidden grid with coin values (0 = no coin, 1 = coin)
         Random rand = new Random();
 
-        // Exercice 4
+        // Exercice 4 - Variables
+
+        // Sources:
         // Source of the empty array - https://stackoverflow.com/a
         // Posted by Oded, modified by community. See post 'Timeline' for change history
         // Retrieved 2025-11-22, License - CC BY-SA 4.0
 
-        string[] emptyStringArray = new string[0];
-
+        string[] emptyStringArray = new string[100];
+        int purchaseCount = 0;
 
         //Exercice 5
         string[] itemsshop = { "Iron Dagger 🗡️", "Healing Potion ⚗️", "Ancient Key 🗝️", "Crossbow 🏹", "Metal Shield 🛡️" };
@@ -420,6 +425,18 @@ public class Program
 
                 case 4:
 
+                    if (purchaseCount == 0) 
+                    { 
+                        Console.WriteLine(EmptyInventory);
+                    }
+                    else 
+                    {
+                        Console.WriteLine(ShowInventory);
+                        for (int i = 0; i < purchaseCount; i++)  
+                        {
+                            Console.WriteLine(emptyStringArray[i]);
+                        }
+                    }
                     break;
 
                 case 5:
@@ -471,6 +488,8 @@ public class Program
 
                                     Console.WriteLine(ShowBuy, itemsshop[itemBought], itemBits);
 
+                                    emptyStringArray[purchaseCount] = itemsshop[itemBought]; 
+                                    purchaseCount++;
                                 }
                             }
                             else
