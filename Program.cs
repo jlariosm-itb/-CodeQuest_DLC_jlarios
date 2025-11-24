@@ -95,7 +95,8 @@ public class Program
 
         // Exercice 3 - Loot the mine Constants
         const string MineStartMessage = "You enter the mine. You have 5 attempts to find coins!";
-        const string EnterCoordinatesMessage = "Enter coordinates (X and Y between 0 and 4): ";
+        const string EnterXCoordinatesMessage = "Enter coordinates (X between 0 and 4): ";
+        const string EnterYCoordinatesMessage = "Enter coordinates (Y between 0 and 4): ";
         const string FoundCoinMessage = "Congratulations! You found a coin and earned {0} bits!";
         const string NoCoinMessage = "Sorry, no coin here. Try again!";
         const string InvalidCoordinatesMessage = "Invalid coordinates! Please enter values between 0 and 4.";
@@ -110,6 +111,7 @@ public class Program
 
         // Exercice 4 - Show inventory
         const string ShowInventory = "Your inventory contains:";
+        const string EmptyInventory = "Your inventory is empty...";
 
         // Exercice 5 - Buy Items Constants
         const string AmegoSegarro = 
@@ -184,6 +186,15 @@ public class Program
         const string ContinueBuy = "Would you like to try buying another item? (yes to continue, 0 to exit)";
         const string ReChooseItem = "Choose an item to buy or enter 0 to exit.";
 
+        // Exercice 6
+        const string ShowAtkMsg = "This is your level and your attaks:";
+        const string AtkLvl1 = "Level 1 - Magic Spark 💫";
+        const string AtkLvl2 = "Level 2 - Fireball 🔥, Ice Ray 🧊, Arcane Shield ⚕️";
+        const string AtkLvl3 = "Level 3 - Meteor ☄️, Pure Energy Explosion 💥, Minor Charm 🎭, Air Strike 🍃";
+        const string AtkLvl4 = "Level 4 - Wave of Light ⚜️, Storm of Wings 🐦";
+        const string AtkLvl5 = "Level 5 - Cataclysm 🌋, Portal of Chaos 🌀, Arcane Blood Pact 🩸, Elemental Storm ⛈️";
+        const string OverLvl = "Your level is bigger than 5 so you have all the attaks and you are overlevel...";
+
         //Exercice 1 - Variables
         int op = 0;
         bool validInput;
@@ -199,7 +210,6 @@ public class Program
         int[] hpMonsters = { 3, 5, 10, 11, 18, 15, 20, 50 };
 
         // Exercice 3 - Variables
-        int attempts = MaxAttempts;
         int totalCoins = 0;
         string[,] visibleGrid = new string[GridSize, GridSize]; // Visible grid for the player
         int[,] hiddenGrid = new int[GridSize, GridSize]; // Hidden grid with coin values (0 = no coin, 1 = coin)
@@ -367,10 +377,13 @@ public class Program
                         for (int j = 0; j < GridSize; j++)
                         {
                             visibleGrid[i, j] = "➖"; // Empty symbol
-                            hiddenGrid[i, j] = rand.Next(0, 2);
+                            hiddenGrid[i, j] = rand.Next(0, 2); // Random mines (0 = no mine, 1 = mine)
                         }
                     }
+
                     Console.WriteLine(MineStartMessage);
+                    int attempts = MaxAttempts;
+
                     while (attempts > 0)
                     {
                         Console.WriteLine(MineAttemps, attempts);
@@ -386,14 +399,26 @@ public class Program
                             Console.WriteLine();
                         }
 
-                        Console.Write(EnterCoordinatesMessage);
-                        string[] input = Console.ReadLine().Split();
-
-                        // Validate the coordinates input
-                        if (input.Length != 2 || !int.TryParse(input[0], out int x) || !int.TryParse(input[1], out int y) || x < 0 || x >= GridSize || y < 0 || y >= GridSize)
+                        // X Cordinates 
+                        int x = -1;
+                        while (x < 0 || x >= GridSize)
                         {
-                            Console.WriteLine(InvalidCoordinatesMessage);
-                            continue;
+                            Console.WriteLine(EnterXCoordinatesMessage);
+                            if (!int.TryParse(Console.ReadLine(), out x) || x < 0 || x >= GridSize)
+                            {
+                                Console.WriteLine(InvalidCoordinatesMessage);
+                            }
+                        }
+
+                        // Y Cordinates
+                        int y = -1;
+                        while (y < 0 || y >= GridSize)
+                        {
+                            Console.WriteLine(EnterYCoordinatesMessage);
+                            if (!int.TryParse(Console.ReadLine(), out y) || y < 0 || y >= GridSize)
+                            {
+                                Console.WriteLine(InvalidCoordinatesMessage);
+                            }
                         }
 
                         // Check if the cell has already been excavated
@@ -407,7 +432,7 @@ public class Program
                         if (hiddenGrid[x, y] == 1)
                         {
                             visibleGrid[x, y] = "🪙"; // Coin found
-                            itemBits += rand.Next(5, 51); 
+                            itemBits += rand.Next(5, 51);
                             Console.WriteLine(FoundCoinMessage, itemBits);
                         }
                         else
@@ -419,8 +444,8 @@ public class Program
                         attempts--;
                     }
 
-                    // Game Over, show total coins found
                     Console.WriteLine(GameOverMine, itemBits);
+
                     break;
 
                 case 4:
@@ -499,7 +524,34 @@ public class Program
                         }
                     } while (continueBuying && itemInput != "0");
 
+                    break;
 
+                case 6:
+                    Console.WriteLine(ShowAtkMsg);
+                    if (wizardlvl == 1)
+                    {
+                        Console.WriteLine(AtkLvl1);
+                    }
+                    else if (wizardlvl == 2) 
+                    {
+                        Console.WriteLine(AtkLvl2);
+                    }
+                    else if (wizardlvl == 3)
+                    {
+                        Console.WriteLine(AtkLvl3);
+                    }
+                    else if (wizardlvl == 4)
+                    {
+                        Console.WriteLine(AtkLvl4);
+                    }
+                    else if (wizardlvl == 5)
+                    {
+                        Console.WriteLine(AtkLvl5);
+                    }
+                    else
+                    {
+                        Console.WriteLine(OverLvl);
+                    }
                     break;
 
                 case 0:
