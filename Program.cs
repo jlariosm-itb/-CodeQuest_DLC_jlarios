@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Diagnostics.Metrics;
+using System.Security.Cryptography.X509Certificates;
+using System.Text;
 
 public class Program
 {
@@ -8,12 +11,16 @@ public class Program
 
         //Exercice 1 - Menu Constants
         const string MenuTitle = "===== MAIN MENU - CODEQUEST =====";
-        const string MenuOption1 = "1. Train your wizard";
-        const string MenuOption2 = "2. Increase LVL";
-        const string MenuOption3 = "3. Loot the mine";
-        const string MenuOptionExit = "0. Exit game";
-        const string MenuPrompt = "Choose an option (1-3) - (0) to exit: ";
-        const string InputErrorMessage = "Invalid input. Please enter a number between 0 and 3.";
+        const string MenuOption1 = "1. Train your wizard - Entrenar el mag";
+        const string MenuOption2 = "2. Increase LVL - Combatre i pujar de nivell";
+        const string MenuOption3 = "3. Loot the mine - Minar per aconseguir bits (moneda del joc)";
+        const string MenuOption4 = "4. Show inventory - Mostrar inventari";
+        const string MenuOption5 = "5. Buy items - Comprar objectes";
+        const string MenuOption6 = "6. Show attacks by LVL - Veure atacs disponibles segons el nivell";
+        const string MenuOption7 = "7. Decode ancient Scroll - Desxifrar pergamins màgics";
+        const string MenuOptionExit = "0. Exit game - Sortir";
+        const string MenuPrompt = "Choose an option (1-7) - (0) to exit: ";
+        const string InputErrorMessage = "Invalid input. Please enter a number between 0 and 7.";
 
         //Exercice 1 - Training Messages
         const string NameMessage = "Please tell me your name:";
@@ -101,6 +108,79 @@ public class Program
         const int GridSize = 5;
         const int MaxAttempts = 5;
 
+        // Exercice 5 - Buy Items Constants
+        const string AmegoSegarro = 
+            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠌⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀\r\n" +
+            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠤⣜⡧⠄⠀⠀⠀⢀⣀⢀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀\r\n" +
+            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠉⠚⠒⠒⠒⠂⠀⠤⠬⠥⠤⢍⡉⣁⣒⣒⣒⠒⣠⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀\r\n" +
+            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⢁⠀⠀⢰⡀⠈⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀\r\n" +
+            "⠀⣀⣀⣀⣀⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠰⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀\r\n" +
+            "⠀⠹⠉⠉⠉⠉⠉⠉⠉⠛⠛⠛⠒⠒⠒⠒⠲⠲⠶⠤⠤⠤⠤⢤⣤⠤⣄⣀⣀⣀⣀⣀⡀⠀⠀⠀⠀⠀⠈⠀⠀⠀⠀⠀⠀⠀⠀⠀⠰⠤⠄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀\r\n" +
+            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠉⠉⠉⠉⠉⠉⠙⠙⠓⠓⠒⠒⠒⠞⠲⠖⠤⠄⠤⠄⢰⡄⢀⣀⠀⣀⣀⣀⣀⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀\r\n" +
+            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠈⠉⠉⠀⠀⠒⠒⠒⠂⠒⠀⠀⠀⠤⢤⡄⠀⠀⠀⠀⠀\r\n" +
+            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⡇⠀⠀⠀⠀⠀\r\n" +
+            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⡇⠀⠀⠀⠀⠀\r\n" +
+            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⡇⠀⠀⠀⠀⠀\r\n" +
+            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡇⠀⠀⠀⠀⠀\r\n" +
+            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢠⡇⠀⠀⠀⠀⠀\r\n" +
+            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠐⡇⠀⠀⠀⠀⠀\r\n" +
+            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⡇⠀⠀⠀⠀⠀\r\n" +
+            "⠀⠀⠂⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣀⣠⣄⣠⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡇⠀⠀⠀⠀⠀\r\n" +
+            "⠀⠀⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣤⣶⣿⣿⣿⣿⣿⣿⣿⣿⣷⣦⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡇⠀⠀⠀⠀⠀\r\n" +
+            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢠⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣦⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠇⠀⠀⠀⠀⠀\r\n" +
+            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢠⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣷⠀⠀⠀⠀⠀\r\n" +
+            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿⣿⣿⣿⣿⣿⣿⡿⣿⢿⣿⠿⡿⣿⣿⣿⣿⣿⣧⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣀⣤⣤⣀⡤⣄⠀⠀⠀⢀⣴⣿⠀⠀⠀⠀⠀\r\n" +
+            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿⣿⣿⣿⣿⡿⣋⠟⡛⠩⢄⠓⡰⢽⣿⠛⢿⣿⣿⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⠤⠛⠛⠲⠷⢶⣼⢳⣤⣁⣙⠀⣚⠀⠀⠀⠀⠀\r\n" +
+            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿⣿⣿⣟⡣⡗⢭⢚⡰⢁⠎⠠⢁⠒⠀⠢⢈⠻⣿⡆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠀⠀⠀⠀⠀⠀⠈⡃⠛⠛⠀⠉⢹⠀⠀⠀⠀⠀\r\n" +
+            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣽⣿⢳⣬⣷⣾⣶⣧⣼⡢⢌⣡⣶⣾⣿⣷⡶⠆⢻⠗⣷⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡇⠀⠀⢸⣿⢾⠀⠀⠀⠀⠀\r\n" +
+            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠸⣿⣿⢣⣟⣽⣿⣿⣛⣿⣿⠋⢉⣿⣿⡿⠟⠛⠀⢹⣷⡏⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣇⠀⠀⢸⣿⣾⠀⠀⠀⠀⠀\r\n" +
+            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠹⣿⣷⣬⣶⣽⣶⣯⣭⣧⣋⣀⣈⣍⣹⣈⣍⣀⣸⣿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢰⣿⡆⠀⠀⠁⢸⠀⠀⠀⠀⠀\r\n" +
+            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠹⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣠⢀⡎⠈⣁⣠⣤⣤⢬⡀⠀⠀⠀⠀\r\n" +
+            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣼⣿⣷⣾⣵⣿⣿⣽⣾⣮⣷⣷⣶⣶⣾⢾\r\n" +
+            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣀⣨⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠋⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣿⣿⣿⡽⢯⢿⡿⠿⠿⢻⠟⣿⠟⣿⣿⣯⠟\r\n" +
+            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣠⣤⣶⣶⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣶⣶⣤⣄⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢌⣿⣿⣿⣧⣿⣿⣿⣷⣾⣿⣶⣿⣶⣿⣿⣯⠟\r\n" +
+            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣠⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⢻⣿⣿⣿⣿⣿⢿⣟⣯⢷⡀⠀⠀⠀⠀⠀⠀⠀⢀⣀⣀⣠⣤⣤⣤⣤⣼⣿⣿⡿⠭⠿⠿⠶⠾⠷⠾⠶⡿⣱⢾⣿⣿⡳\r\n" +
+            "⠀⠀⠀⢀⣿⣷⣄⠀⠀⠀⠀⠀⠀⢀⣀⣀⣀⣀⣼⣿⡿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡛⢯⠋⡍⠈⢸⣿⣿⣿⣿⣿⣟⣯⣿⡿⣽⣫⡉⠉⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡞⢸⣿⠀⠀⠀⠀⠀⠀⠀⠀⠀⣷⠀⢸⣿⣿⡇\r\n" +
+            "⠀⠀⠀⣽⣿⣿⣿⣯⠉⠉⠉⠁⠀⠀⠀⠀⠀⢸⣿⣯⣿⢷⣻⣿⣿⣿⣿⣿⣿⣿⡿⣿⣿⣿⣿⣿⣿⣿⠜⠂⠁⠀⠀⠈⣿⣯⣿⣿⣿⣿⣾⣟⣿⣿⣳⢿⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢠⠃⢸⣿⠀⠀⠀⠀⠀⠀⠀⠀⠀⣯⠀⢸⣿⣿⣗\r\n" +
+            "⠀⠀⢰⣿⣿⣿⣿⣿⣷⣄⡀⠀⠀⠀⠀⠀⠀⣾⣟⣿⢿⣿⣽⡾⣿⣿⣿⣿⣻⣷⣿⢿⣿⣿⣿⣿⣿⣯⣷⣤⣀⠀⠀⢸⣿⣿⣿⣽⣿⣟⡿⣝⣻⣿⣽⣟⣧⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣎⠀⠰⣿⡀⠀⠀⠀⠀⠀⠀⠀⠀⡇⠀⢸⣿⣿⣿\r\n" +
+            "⠀⠀⣼⣿⣿⣿⣿⣿⣿⠟⠁⠀⠀⠀⠀⠀⠀⣿⣿⡽⣟⣿⣻⣿⣷⣯⢿⣿⣿⣿⣿⣿⢿⣿⣿⣿⣿⣿⣿⣿⣿⣟⣦⣼⣟⣷⣿⣿⡿⣾⡽⣞⡷⣿⣿⣿⣿⣇⠀⠀⠀⠀⠀⠀⠀⠀⠀⡘⢸⠀⠀⣿⡅⠀⠀⠀⠀⠀⠀⠀⠀⠰⠀⣸⣿⣿⣿\r\n" +
+            "⠀⠀⠻⢿⣿⣿⣿⡟⠁⠀⠀⠀⠀⠀⠀⠀⠀⣿⡷⣿⢯⣷⣻⢾⣽⣟⣯⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⣿⣿⣿⣿⣿⡿⣟⣷⣻⢿⣝⡾⣿⣹⣿⣿⣿⣾⡄⠀⠀⠀⠀⠀⠀⠀⢸⠃⠸⠀⠀⣿⣇⣀⣠⣤⣤⡤⣤⣤⠤⠷⢶⣿⣿⣿⣿\r\n" +
+            "⠀⠀⠀⠀⠙⠿⠋⠀⠀⠀⠀⠀⠀⠀⠀⠀⢠⣿⣿⡽⣯⢷⣯⣟⣾⣻⢿⣾⣿⣿⣿⣿⣿⣷⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⢿⣽⡞⣷⢯⡞⣽⣳⠽⣯⣿⣿⣟⣷⡀⠀⠀⠀⠀⠀⢠⠇⠀⠀⠀⢸⣿⣿⣿⣿⣾⣶⣽⣷⣋⣋⡉⣼⣿⣿⣿⣿\r\n" +
+            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⡿⣞⣿⣽⣻⢾⡽⣶⢯⣿⣻⣿⣿⣿⣿⣿⣿⣿⣟⣿⣿⣿⣻⣿⣿⣿⣿⡿⣾⣹⢿⣯⣯⣟⣳⢯⣛⣷⣻⣿⣿⣯⣧⠀⠀⠀⠀⠀⢸⠂⠀⠀⠀⢈⣿⣿⢯⡛⣟⠻⠻⠿⣿⣿⣿⣿⣿⣿⣿⣿\r\n" +
+            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢿⣿⣿⣳⣯⣟⣯⣿⣷⣻⡾⣽⣾⣿⣿⣿⣿⣿⣿⣿⣿⢿⣿⣿⣯⣿⣿⣿⣿⣿⣿⣯⣟⣷⣯⣟⣯⡽⣶⣻⣿⣿⣿⣽⠆⠀⠀⠀⠠⠃⠀⠀⠀⠀⠈⣿⣿⢀⠱⢈⠂⠁⠀⠀⢈⣿⣿⣿⣿⣿⣿\r\n" +
+            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠐⢿⣿⣿⣿⣿⣿⣷⣿⣷⣿⣟⡿⣿⣻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⣿⣿⣿⣿⣿⣾⣽⣞⣷⣟⣯⣿⣿⣿⣿⣿⣻⡄⠀⢀⠇⠀⠀⠀⠀⠀⠀⢿⣿⠀⠀⠂⠀⠀⠀⠀⠀⣿⣿⣿⣿⣿⣿\r\n" +
+            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⣿⣿⣟⣿⣿⣿⣿⣿⣯⣿⣽⣷⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⣻⣳⠀⠌⠀⡀⠀⠀⠀⠀⠀⢹⣿⠀⠀⠀⠀⠀⠀⠀⠀⢿⣿⣿⣿⣿⣿\r\n" +
+            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢹⣿⣿⡿⣿⣳⣟⣾⣿⣿⣿⣿⣯⣟⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣾⠿⠋⠛⠒⠚⠿⣀⠤⠤⣀⠀⢹⣿⠀⠀⠀⠀⠀⠀⠀⠀⢹⣿⣿⣿⣿⣿\r\n" +
+            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⣿⣿⣿⣿⣿⣟⡿⣞⣧⣟⣷⠿⡿⣿⢿⡿⣿⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣻⣽⣿⡿⠿⠿⠿⢛⠡⠀⡄⢁⠂⠌⣀⠠⢀⣶⡼⠂⢸⣿⠀⣀⣀⣀⣀⣀⣤⣤⣾⣿⣿⣿⣿⣿\r\n" +
+            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⣿⣿⣿⣿⣻⣾⠿⠛⠉⠁⡀⠰⠐⡀⠆⡐⠄⠂⠄⠠⠀⠂⠄⠉⠌⠉⠉⡉⠉⡉⢉⠉⠌⡈⠡⢀⠂⠄⢃⡘⠐⣂⠡⢂⠰⡀⢎⠰⣄⠣⢎⣹⣆⣠⣾⣿⡿⣛⢭⡒⢶⡘⡴⢪⡝⡭⣟⡽⣻⣿\r\n" +
+            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠘⣿⣿⡿⠟⠉⠀⠀⠀⠀⠀⠠⠁⠂⠐⠀⡀⠐⠈⠀⠀⠀⠀⠀⠀⠀⠀⠁⠀⢀⠀⠂⢀⠠⠐⢀⠂⡌⠐⢂⠄⠣⡄⢎⡰⢡⠞⣬⢳⣬⣿⣶⣿⡿⣟⢫⡒⡱⣉⢏⣛⢳⡛⣼⣓⠾⣵⢯⣿⣿⣿\r\n" +
+            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿⡟⡱⢌⡱⢠⠐⠀⠀⠁⠀⠀⠀⠀⠀⠀⠐⠀⠀⠀⠀⠀⢀⠀⢀⠀⢀⡀⠀⢄⠢⢀⠢⡘⢠⠒⣌⠱⣊⢌⠳⡘⢦⣑⣷⣾⣣⣿⣿⣿⣿⣿⡿⣜⢦⠳⡱⢎⡖⣎⢷⡹⢲⣍⣾⢿⣛⣽⣟⣻\r\n" +
+            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣀⣀⣀⣀⣠⣤⡤⠼⣧⠳⡌⠴⡁⠎⡐⠀⢂⠀⡀⠄⠂⢁⠐⠁⡐⢈⡐⢈⡐⠢⢈⠢⠌⡂⡔⢩⢐⡸⢄⡓⣌⢣⡝⣰⢋⣶⣩⣷⣿⣾⣿⣿⣿⣿⣿⣿⢿⣻⢷⡻⣜⢎⡳⣙⢮⡼⣝⣾⣽⠿⣿⣻⢿⣛⣯⣽⣿\r\n" +
+            "⡲⢶⣲⣶⠾⠛⠋⠉⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠘⣧⡝⡲⡉⠖⡡⢉⠔⢂⠡⡀⠆⢂⠌⢂⠌⢠⠈⡄⢄⠣⢌⠢⣑⠲⡘⣆⣣⣜⣦⣳⣮⠷⠾⠷⠛⠫⢉⠃⠅⠣⠜⣿⣿⣿⣾⣽⣯⣳⣏⡳⡜⢮⣵⣿⣽⣻⠿⣛⢿⣽⡿⡽⣿⢿⣛⣳⣿\r\n" +
+            "⣿⣷⣿⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿⡼⣅⢣⠓⣄⠣⡘⣄⠣⡰⢈⣆⣜⣠⣎⣤⣣⣼⠦⠷⠾⠳⠛⠛⠛⠉⠉⠉⠀⠀⠀⠀⠂⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠙⠛⠿⢿⣿⣿⣿⣷⣾⣧⣯⣗⣾⡿⣽⣞⣽⣿⢽⣟⡾⣿⣛\r\n" +
+            "⠛⣇⣹⡆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠐⠃⠛⠺⠳⠛⠚⠛⠛⠉⠙⠉⠉⠉⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠉⠛⠛⠿⢿⣿⣿⣿⣷⣿⣾⣯⣿⣛⡿⣦⢿\r\n" +
+            "⠀⢻⡰⣧⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠉⠛⠛⠿⢿⣿⣿⣿⣿⣿\r\n" +
+            "⠀⠸⣷⢸⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠉⠙⠛\r\n" +
+            "⠀⠀⣿⢜⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀\r\n" +
+            "⠀⠀⢸⣏⣾⠀⢀⣴⢶⣻⢻⣟⢾⣛⣟⣻⣟⣻⡟⣟⣟⣻⡷⣶⣞⣾⣶⣶⣶⣶⡶⣶⢶⡶⣶⢶⡶⣶⢶⣶⣶⢶⣶⢶⡶⣦⢶⣴⣤⣤⣤⣤⣤⣤⣤⣤⣤⣤⣤⣤⣤⣤⣤⣤⣤⣄⣤⣠⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⡀⠀⠀⠀⢀\r\n" +
+            "⠀⠀⠸⣿⣼⣧⣾⣿⣾⣷⣿⣾⣿⣷⣾⣷⣾⣷⣿⣿⣿⣷⣿⣿⣽⣾⣷⣿⣾⣷⣿⣿⣯⣿⣽⣯⣿⣽⣿⣾⣽⣿⣾⣿⣽⣯⣿⣽⣯⣟⣾⣳⣯⣞⣶⣳⣞⣶⣳⣞⣶⣳⣞⣶⣳⣞⣶⣹⢎⡷⣭⣺⣱⡝⣬⢳⡬⣝⣬⠳⣜⣣⢭⡽⣸⠝⣎\r\n" +
+            "⠀⠀⠀⣿⣯⣛⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿\r\n" +
+            "⠀⠀⠀⢹⣷⣽⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿\r\n" +
+            "⢦⣄⠀⠸⣿⢾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿\r\n" +
+            "⠈⢿⣿⡄⣷⣻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿";
+
+        const string TenehSegearro = "Ola amego cuanto tempo!!! Amego tene segarro?";
+        const string BuyItems = "Wellcome to the shop, here you can buy items with your bits, please tell me if you need something...";
+        const string ShowItems = "Here you have our current stock:\r\n" +
+            "{0}\r\n" +
+            "This is your credit {1}";
+        const string TimeToBuy = "Select what do you want to buy: ";
+        const string NoMoney = "Ma friendo, you dont have enough money to buy that... Pls do JobAplications or something...";
+        const string ShowBuy = "You bought {0}, you left {1} bits, 0 to exit.";
+        const string InvalidBuy = "Invalid number try again...";
+        const string ContinueBuy = "Would you like to try buying another item? (yes to continue, 0 to exit)";
+        const string ReChooseItem = "Choose an item to buy or enter 0 to exit.";
+
         //Exercice 1 - Variables
         int op = 0;
         bool validInput;
@@ -122,6 +202,20 @@ public class Program
         int[,] hiddenGrid = new int[GridSize, GridSize]; // Hidden grid with coin values (0 = no coin, 1 = coin)
         Random rand = new Random();
 
+        // Exercice 4
+        // Source of the empty array - https://stackoverflow.com/a
+        // Posted by Oded, modified by community. See post 'Timeline' for change history
+        // Retrieved 2025-11-22, License - CC BY-SA 4.0
+
+        string[] emptyStringArray = new string[0];
+
+
+        //Exercice 5
+        string[] itemsshop = { "Iron Dagger 🗡️", "Healing Potion ⚗️", "Ancient Key 🗝️", "Crossbow 🏹", "Metal Shield 🛡️" };
+        int[] itemsprice = { 30, 10, 50, 40, 20 };
+        int itemBits = 0;
+
+
 
         do
         {
@@ -129,6 +223,10 @@ public class Program
             Console.WriteLine(MenuOption1);
             Console.WriteLine(MenuOption2);
             Console.WriteLine(MenuOption3);
+            Console.WriteLine(MenuOption4);
+            Console.WriteLine(MenuOption5);
+            Console.WriteLine(MenuOption6);
+            Console.WriteLine(MenuOption7);
             Console.WriteLine(MenuOptionExit);
             Console.Write(MenuPrompt);
 
@@ -304,8 +402,8 @@ public class Program
                         if (hiddenGrid[x, y] == 1)
                         {
                             visibleGrid[x, y] = "🪙"; // Coin found
-                            totalCoins += rand.Next(5, 51); 
-                            Console.WriteLine(FoundCoinMessage, totalCoins);
+                            itemBits += rand.Next(5, 51); 
+                            Console.WriteLine(FoundCoinMessage, itemBits);
                         }
                         else
                         {
@@ -317,7 +415,72 @@ public class Program
                     }
 
                     // Game Over, show total coins found
-                    Console.WriteLine(GameOverMine, totalCoins);
+                    Console.WriteLine(GameOverMine, itemBits);
+                    break;
+
+                case 4:
+
+                    break;
+
+                case 5:
+                    Console.WriteLine(AmegoSegarro);
+                    Console.WriteLine(TenehSegearro);
+                    Console.WriteLine(BuyItems);
+                    var itemsWithPrices = new StringBuilder(); //Object created for contain data
+                    for (int i = 0; i < itemsshop.Length; i++)
+                    {
+                        itemsWithPrices.AppendLine($"{i + 1}. {itemsshop[i]} - {itemsprice[i]}");
+                    }
+                    Console.WriteLine(ShowItems, itemsWithPrices, itemBits);
+
+                    Console.WriteLine(TimeToBuy);
+                    string itemInput;
+                    bool continueBuying = true; // Flag to control the buying loop
+
+                    do
+                    {
+                        itemInput = Console.ReadLine();
+
+                        if (int.TryParse(itemInput, out int seleccion))
+                        {
+                            // Subtract 1 because arrays are 0-indexed
+                            int itemBought = seleccion - 1;
+
+                            if (itemBought >= 0 && itemBought < itemsshop.Length)
+                            {
+                                if (itemsprice[itemBought] > itemBits)
+                                {
+                                    Console.WriteLine(NoMoney);
+
+                                    Console.WriteLine(ContinueBuy);
+
+                                    string tryAgain = Console.ReadLine().ToLower();
+                                    if (tryAgain == "0")
+                                    {
+                                        continueBuying = false; // Set the flag to false to stop the loop
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine(ReChooseItem);
+                                        continue; // Continue the loop
+                                    }
+                                }
+                                else
+                                {
+                                    itemBits -= itemsprice[itemBought];
+
+                                    Console.WriteLine(ShowBuy, itemsshop[itemBought], itemBits);
+
+                                }
+                            }
+                            else
+                            {
+                                Console.WriteLine(InvalidBuy);
+                            }
+                        }
+                    } while (continueBuying && itemInput != "0");
+
+
                     break;
 
                 case 0:
